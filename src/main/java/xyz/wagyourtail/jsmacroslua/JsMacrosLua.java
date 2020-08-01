@@ -2,7 +2,6 @@ package xyz.wagyourtail.jsmacroslua;
 
 import java.io.File;
 import java.util.Map;
-import java.util.function.Consumer;
 
 import org.luaj.vm2.Globals;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
@@ -14,7 +13,6 @@ import xyz.wagyourtail.jsmacros.runscript.RunScript;
 import xyz.wagyourtail.jsmacros.runscript.functions.Functions;
 
 public class JsMacrosLua implements ClientModInitializer {
-    public static Consumer<String> log = (s) -> {System.out.println(s);};
 
     @Override
     public void onInitializeClient() {
