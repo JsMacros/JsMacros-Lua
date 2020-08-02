@@ -1,9 +1,6 @@
-# Fabric Example Mod
+# JsMacros-Lua
 
-## Setup
+This extension adds `lua 5.2` support to [JsMacros](https://github.com/wagyourtail/JsMacros)
 
-For setup instructions please see the [fabric wiki page](https://fabricmc.net/wiki/tutorial:setup) that relates to the IDE that you are using.
-
-## License
-
-This template is available under the CC0 license. Feel free to learn from it and incorporate it in your own projects.
+All libraries provided by JsMacros need a `:` rather than a `.` because of how methods of classes are accessed in lua.
+ie. `chat:log("test")`
