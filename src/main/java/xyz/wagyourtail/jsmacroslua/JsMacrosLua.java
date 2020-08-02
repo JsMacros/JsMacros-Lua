@@ -11,9 +11,11 @@ import net.fabricmc.api.ClientModInitializer;
 import xyz.wagyourtail.jsmacros.config.RawMacro;
 import xyz.wagyourtail.jsmacros.runscript.RunScript;
 import xyz.wagyourtail.jsmacros.runscript.functions.Functions;
+import xyz.wagyourtail.jsmacroslua.functions.consumerFunctions;
 
 public class JsMacrosLua implements ClientModInitializer {
-
+    private static Functions consumerFix = new consumerFunctions("consumer");
+    
     @Override
     public void onInitializeClient() {
 
@@ -28,6 +30,8 @@ public class JsMacrosLua implements ClientModInitializer {
                     if (!f.excludeLanguages.contains(".js"))
                         globals.set(f.libName, CoerceJavaToLua.coerce(f));
                 }
+                globals.set(consumerFix.libName, CoerceJavaToLua.coerce(consumerFix));
+                
                 
                 globals.loadfile(file.getCanonicalPath()).call();
                 
