@@ -31,7 +31,9 @@ public class JsMacrosLua implements ClientModInitializer {
                         globals.set(f.libName, CoerceJavaToLua.coerce(f));
                 }
                 globals.set(consumerFix.libName, CoerceJavaToLua.coerce(consumerFix));
-                
+                globals.set("event", CoerceJavaToLua.coerce(event));
+                globals.set("args", CoerceJavaToLua.coerce(args));
+                globals.set("file", CoerceJavaToLua.coerce(file));
                 
                 globals.loadfile(file.getCanonicalPath()).call();
                 
