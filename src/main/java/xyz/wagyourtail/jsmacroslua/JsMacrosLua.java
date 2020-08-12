@@ -55,7 +55,7 @@ public class JsMacrosLua implements ClientModInitializer {
                 }
                 
                 
-                globals.load(script);
+                globals.load(script).call();
             }
 
             @Override
