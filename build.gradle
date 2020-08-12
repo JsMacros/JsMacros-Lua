@@ -28,7 +28,7 @@ dependencies {
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	
-	modImplementation name: "jsmacros-1.16.1-1.2.2-beta-b071ddf-dev"
+	modImplementation name: "jsmacros-1.16.2-1.2.4-beta-921af6a-dev"
 	
 	implementation group: 'org.luaj', name: 'luaj-jse', version: '3.0.1'
 	include group: 'org.luaj', name: 'luaj-jse', version: '3.0.1'

@@ -1,6 +1,7 @@
 package xyz.wagyourtail.jsmacroslua;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Map;
 
 import org.luaj.vm2.Globals;
@@ -14,7 +15,6 @@ import xyz.wagyourtail.jsmacros.runscript.functions.Functions;
 import xyz.wagyourtail.jsmacroslua.functions.consumerFunctions;
 
 public class JsMacrosLua implements ClientModInitializer {
-    private static Functions consumerFix = new consumerFunctions("consumer");
     
     @Override
     public void onInitializeClient() {
@@ -22,7 +22,8 @@ public class JsMacrosLua implements ClientModInitializer {
         
         // register language
         RunScript.addLanguage(new RunScript.Language() {
-
+            private Functions consumerFix = new consumerFunctions("consumer");
+            
             @Override
             public void exec(RawMacro macro, File file, String event, Map<String, Object> args) throws Exception {
                 Globals globals = JsePlatform.standardGlobals();
@@ -39,11 +40,29 @@ public class JsMacrosLua implements ClientModInitializer {
                 
             }
 
+            
+            @Override
+            public void exec(String script, Map<String, Object> global, Path path) throws Exception {
+                Globals globals = JsePlatform.standardGlobals();
+                for (Functions f : RunScript.standardLib) {
+                    if (!f.excludeLanguages.contains(".js"))
+                        globals.set(f.libName, CoerceJavaToLua.coerce(f));
+                }
+                globals.set(consumerFix.libName, CoerceJavaToLua.coerce(consumerFix));
+                
+                if (global != null) for (Map.Entry<String, Object> e : global.entrySet()) {
+                    globals.set(e.getKey(), CoerceJavaToLua.coerce(e.getValue()));
+                }
+                
+                
+                globals.load(script);
+            }
 
             @Override
             public String extension() {
                 return ".lua";
             }
+
 
         });
 
