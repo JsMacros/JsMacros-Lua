@@ -27,5 +27,8 @@
     "fabricloader": ">=0.7.4",
     "minecraft": "*",
     "jsmacros": "*"
+  },
+  "custom": {
+    "modmenu:parent": "jsmacros"
   }
 }
