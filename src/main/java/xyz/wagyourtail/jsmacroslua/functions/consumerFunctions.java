@@ -21,20 +21,32 @@ public class consumerFunctions extends Functions {
     }
     
     public Consumer<Object> toConsumer(LuaClosure c) {
-        return new Consumer<Object>() {
-            @Override
-            public void accept(Object arg0) {
-                c.call(CoerceJavaToLua.coerce(arg0));
-            }
+        return (arg0) -> {
+            c.call(CoerceJavaToLua.coerce(arg0));
         };
     }
     
     public BiConsumer<Object, Object> toBiConsumer(LuaClosure c) {
-        return new BiConsumer<Object, Object>() {
-            @Override
-            public void accept(Object arg0, Object arg1) {
+        return (arg0, arg1) -> {
+            c.call(CoerceJavaToLua.coerce(arg0), CoerceJavaToLua.coerce(arg1));
+        };
+    }
+    
+    public Consumer<Object> toAsyncConsumer(LuaClosure c) {
+        return (arg0) -> {
+            Thread t = new Thread(() -> {
+                c.call(CoerceJavaToLua.coerce(arg0));
+            });
+            t.start();
+        };
+    }
+    
+    public BiConsumer<Object, Object> toAsyncBiConsumer(LuaClosure c) {
+        return (arg0, arg1) -> {
+            Thread t = new Thread(() -> {
                 c.call(CoerceJavaToLua.coerce(arg0), CoerceJavaToLua.coerce(arg1));
-            }
+            });
+            t.start();
         };
     }
 }
