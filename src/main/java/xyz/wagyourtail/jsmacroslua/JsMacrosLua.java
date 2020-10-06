@@ -9,10 +9,12 @@ import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 import org.luaj.vm2.lib.jse.JsePlatform;
 
 import net.fabricmc.api.ClientModInitializer;
+import xyz.wagyourtail.jsmacros.api.sharedinterfaces.IEvent;
 import xyz.wagyourtail.jsmacros.config.RawMacro;
+import xyz.wagyourtail.jsmacros.extensionbase.Functions;
+import xyz.wagyourtail.jsmacros.extensionbase.ILanguage;
 import xyz.wagyourtail.jsmacros.runscript.RunScript;
-import xyz.wagyourtail.jsmacros.runscript.functions.Functions;
-import xyz.wagyourtail.jsmacroslua.functions.consumerFunctions;
+import xyz.wagyourtail.jsmacroslua.functions.FConsumerLua;
 
 public class JsMacrosLua implements ClientModInitializer {
     
@@ -21,11 +23,11 @@ public class JsMacrosLua implements ClientModInitializer {
 
         
         // register language
-        RunScript.addLanguage(new RunScript.Language() {
-            private Functions consumerFix = new consumerFunctions("consumer");
+        RunScript.addLanguage(new ILanguage() {
+            private Functions consumerFix = new FConsumerLua("consumer");
             
             @Override
-            public void exec(RawMacro macro, File file, String event, Map<String, Object> args) throws Exception {
+            public void exec(RawMacro macro, File file, IEvent event) throws Exception {
                 Globals globals = JsePlatform.standardGlobals();
                 for (Functions f : RunScript.standardLib) {
                     if (!f.excludeLanguages.contains(".js"))
@@ -33,7 +35,6 @@ public class JsMacrosLua implements ClientModInitializer {
                 }
                 globals.set(consumerFix.libName, CoerceJavaToLua.coerce(consumerFix));
                 globals.set("event", CoerceJavaToLua.coerce(event));
-                globals.set("args", CoerceJavaToLua.coerce(args));
                 globals.set("file", CoerceJavaToLua.coerce(file));
                 
                 globals.loadfile(file.getCanonicalPath()).call();
