@@ -30,7 +30,10 @@ dependencies {
 	
 	modImplementation name: "jsmacros-1.16.3-1.2.7-beta-21df5de-dev"
 	
-	implementation group: 'org.luaj', name: 'luaj-jse', version: '3.0.1'
+	// this allows mixins to work for luaj in the dev environment xd
+	// switch this if you don't care. you can grab the jar from a built copy's meta-inf
+	modImplementation name: "luaj-jse-3.0.1"
+	// implementation group: 'org.luaj', name: 'luaj-jse', version: '3.0.1'
 	include group: 'org.luaj', name: 'luaj-jse', version: '3.0.1'
 
 	//partial fabric api

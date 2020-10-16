@@ -2,7 +2,6 @@
   "schemaVersion": 1,
   "id": "jsmacros-lua",
   "version": "${version}",
-
   "name": "JsMacros Lua",
   "description": "JsMacros Lua Extension",
   "authors": [
@@ -11,10 +10,8 @@
   "contact": {
     "homepage": "wagyourtail.xyz"
   },
-
   "license": "MIT",
-  "icon": "assets/modid/icon.png",
-
+  "icon": "assets/jsmacroslua/icon.png",
   "environment": "*",
   "entrypoints": {
     "client": [
@@ -22,6 +19,7 @@
     ]
   },
   "mixins": [
+    "jsmacroslua.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=0.7.4",

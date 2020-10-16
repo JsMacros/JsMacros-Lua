@@ -14,7 +14,7 @@ build/classes/
 
 # vscode
 
-libs/
+libs/jsmacros*
 .settings/
 .vscode/
 bin/

@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "package": "xyz.wagyourtail.jsmacroslua.bad.idea.mixins",
+  "compatibilityLevel": "JAVA_8",
+  "client": [
+    "MixinCoerceJavaToLua",
+    "MixinPairs",
+    "MixinIPairs",
+    "MixinJavaArray"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
