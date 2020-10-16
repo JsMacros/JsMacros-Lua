@@ -24,4 +24,5 @@ bin/
 # fabric
 
 run/
+logs/
 *.launch
