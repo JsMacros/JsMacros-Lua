@@ -1,4 +1,4 @@
-package xyz.wagyourtail.jsmacroslua.bad.idea;
+package xyz.wagyourtail.jsmacroslua.luaj;
 
 import org.luaj.vm2.LuaString;
 import org.luaj.vm2.LuaUserdata;

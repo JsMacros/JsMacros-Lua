@@ -19,7 +19,6 @@ public class JsMacrosLua implements ClientModInitializer {
     
     @Override
     public void onInitializeClient() {
-
         
         // register language
         RunScript.addLanguage(new ILanguage() {
