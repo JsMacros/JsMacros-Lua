@@ -1,4 +1,4 @@
-package xyz.wagyourtail.jsmacroslua.luaj.mixins;
+package xyz.wagyourtail.jsmacros.lua.luaj.mixins;
 
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.Varargs;
@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import xyz.wagyourtail.jsmacroslua.luaj.Util;
+import xyz.wagyourtail.jsmacros.lua.luaj.Util;
 
 @Mixin(targets = "org.luaj.vm2.lib.BaseLib$pairs", remap = false)
 public class MixinPairs {

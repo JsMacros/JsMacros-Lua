@@ -28,7 +28,7 @@ dependencies {
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	
-	modImplementation name: "jsmacros-1.16.4-1.2.8-dev"
+	modImplementation name: "jsmacros-1.16.4-1.2.9-beta-d39b399-dev"
 
 	modImplementation name: 'luaj-jse-3.0.2'
 	include name: 'luaj-jse-3.0.2'
@@ -51,15 +51,14 @@ dependencies {
 	implementation group: 'com.ibm.icu', name: 'icu4j', version: '64.2'
 	
 	
-    //websocket 
-    implementation "org.java-websocket:Java-WebSocket:1.5.1"
-    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
+    //websocket
     implementation "com.neovisionaries:nv-websocket-client:2.10"
     
 	//nullable not defined so...
 	implementation 'com.google.code.findbugs:jsr305:3.0.2'
-	
 
+	implementation "io.noties:prism4j:${prism_version}"
+	include "io.noties:prism4j:${prism_version}"
 
 	// PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
 	// You may need to force-disable transitiveness on them.

@@ -1,4 +1,4 @@
-package xyz.wagyourtail.jsmacroslua.luaj;
+package xyz.wagyourtail.jsmacros.lua.luaj;
 
 
 import org.luaj.vm2.LuaUserdata;

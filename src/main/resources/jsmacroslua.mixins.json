@@ -1,6 +1,6 @@
 {
   "required": true,
-  "package": "xyz.wagyourtail.jsmacroslua.luaj.mixins",
+  "package": "xyz.wagyourtail.jsmacros.lua.luaj.mixins",
   "compatibilityLevel": "JAVA_8",
   "client": [
     "MixinCoerceJavaToLua",

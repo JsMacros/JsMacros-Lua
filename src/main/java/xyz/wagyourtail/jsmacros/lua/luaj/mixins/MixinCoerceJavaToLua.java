@@ -1,4 +1,4 @@
-package xyz.wagyourtail.jsmacroslua.luaj.mixins;
+package xyz.wagyourtail.jsmacros.lua.luaj.mixins;
 
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
@@ -6,8 +6,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import xyz.wagyourtail.jsmacroslua.luaj.JavaList;
-import xyz.wagyourtail.jsmacroslua.luaj.JavaMap;
+import xyz.wagyourtail.jsmacros.lua.luaj.JavaList;
+import xyz.wagyourtail.jsmacros.lua.luaj.JavaMap;
 
 import java.util.List;
 import java.util.Map;

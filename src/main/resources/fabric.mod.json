@@ -8,14 +8,14 @@
     "WagYourTail"
   ],
   "contact": {
-    "homepage": "wagyourtail.xyz"
+    "homepage": "jsmacros.wagyourtail.xyz"
   },
   "license": "MIT",
   "icon": "assets/jsmacroslua/icon.png",
   "environment": "*",
   "entrypoints": {
     "client": [
-      "xyz.wagyourtail.jsmacroslua.JsMacrosLua"
+      "xyz.wagyourtail.jsmacros.lua.client.JsMacrosLua"
     ]
   },
   "mixins": [
