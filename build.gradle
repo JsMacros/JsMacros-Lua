@@ -28,12 +28,10 @@ dependencies {
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	
-	modImplementation name: "jsmacros-1.16.4-1.2.9-beta-d39b399-dev"
+	modImplementation "jsmacros-1.16.4:jsmacros-1.16.4:${project.jsmacros_version}:dev"
 
-	modImplementation name: 'luaj-jse-3.0.2'
-	include name: 'luaj-jse-3.0.2'
-	//implementation group: 'org.luaj', name: 'luaj-jse', version: '3.0.2'
-	//include group: 'org.luaj', name: 'luaj-jse', version: '3.0.2'
+	modImplementation "luaj-jse:luaj-jse:${project.luaj_version}"
+	include "luaj-jse:luaj-jse:${project.luaj_version}"
 
 	//partial fabric api
 	modImplementation "net.fabricmc.fabric-api:fabric-api-base:${project.api_base_version}"
@@ -58,7 +56,6 @@ dependencies {
 	implementation 'com.google.code.findbugs:jsr305:3.0.2'
 
 	implementation "io.noties:prism4j:${prism_version}"
-	include "io.noties:prism4j:${prism_version}"
 
 	// PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
 	// You may need to force-disable transitiveness on them.

@@ -6,7 +6,11 @@
     "MixinCoerceJavaToLua",
     "MixinPairs",
     "MixinIPairs",
-    "MixinJavaArray"
+    "MixinJavaArray",
+    "MixinLuaClosure",
+    "MixinLuaError",
+    "MixinGlobals",
+    "MixinLexState"
   ],
   "injectors": {
     "defaultRequire": 1

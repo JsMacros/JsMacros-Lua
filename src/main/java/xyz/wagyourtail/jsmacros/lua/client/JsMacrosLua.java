@@ -20,7 +20,7 @@ public class JsMacrosLua implements ClientModInitializer {
         Thread t = new Thread(() -> {
             try {
                 Globals globals = JsePlatform.standardGlobals();
-                globals.load("print(\"lua loaded\")").call();
+                globals.load("print(\"lua pre-loaded\")").call();
             } catch(Exception e) {
                 e.printStackTrace();
             }
