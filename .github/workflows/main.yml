@@ -31,6 +31,34 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      - name: Get Js Macros
+        uses: benday-inc/download-latest-artifact@main
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repository_owner: 'wagyourtail'
+          repository_name: 'jsmacros'
+          workflow_name: 'Build Beta'
+          branch_name: 'master'
+          download_path: '${{ github.workspace }}/libs'
+          download_filename: 'jsmacros.zip'
+      - name: UnZip Js Macros
+        uses: TonyBogdanov/zip@1.0
+        with:
+          args: unzip -qq ./libs/jsmacros.zip -d ./libs
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - uses: actions/github-script@v2
+        id: jsmvers
+        with:
+          result-encoding: string
+          script: |
+            const fs = require("fs")
+            let version = fs.readdirSync("./libs/").filter(e => !e.endsWith("dev.jar") && !e.endsWith("sources.jar") && e.endsWith(".jar"))[0].replace(".jar", "").replace(/jsmacros-.+?-/, "");
+            let file = fs.readFileSync("./gradle.properties");
+            file = file.toString().split("\n").map(e => e.trim().startsWith("jsmacros_version") ? `${e.split("=")[0]}=${version}` : e).join("\n");
+            fs.writeFileSync("./gradle.properties", file)
+
       - name: Build with Gradle
         run: ./gradlew build
 
