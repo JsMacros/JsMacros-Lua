@@ -13,33 +13,31 @@ import java.util.List;
 public class JavaList extends LuaUserdata {
 
     static final LuaValue LENGTH = valueOf("length");
-    static final LuaTable list_metatable = new LuaTable();
+    final LuaTable list_metatable = new LuaTable();
 
-    static {
+    public JavaList(List<?> obj) {
+        super(obj);
+        
         list_metatable.rawset(LuaValue.LEN, new LenFunction());
         list_metatable.rawset(Util.IPAIRS, new ListIPairs());
         list_metatable.rawset(Util.PAIRS, new ListIPairs());
-    }
-
-    public JavaList(List<Object> obj) {
-        super(obj);
         setmetatable(list_metatable);
     }
 
     public LuaValue get(LuaValue key) {
         if (key.equals(LENGTH))
-            return valueOf(((List<Object>) m_instance).size());
+            return valueOf(((List<?>) m_instance).size());
         if (key.isint()) {
             int i = key.toint() - 1;
-            return i >= 0 && i < ((List<Object>) m_instance).size() ?
-            CoerceJavaToLua.coerce(((List<Object>) m_instance).get(i)) :
+            return i >= 0 && i < ((List<?>) m_instance).size() ?
+            CoerceJavaToLua.coerce(((List<?>) m_instance).get(i)) :
             NIL;
         }
         return super.get(key);
     }
 
     public void set(LuaValue key, LuaValue value) {
-        List<Object> list = (List<Object>) m_instance;
+        List<Object> list = (List) m_instance;
         if (key.isint()) {
             int i = key.toint() - 1;
             if (i >= 0) {
@@ -61,7 +59,7 @@ public class JavaList extends LuaUserdata {
 
                 @Override
                 public Varargs invoke(Varargs args) {
-                    List<Object> list = (List<Object>) ((JavaList)args.arg1()).m_instance;
+                    List<?> list = (List<?>) ((JavaList)args.arg1()).m_instance;
                     int index = args.arg(2).toint();
                     if (index == list.size()) return NIL;
                     return varargsOf(LuaValue.valueOf(index + 1), CoerceJavaToLua.coerce(list.get(index)));
@@ -75,7 +73,7 @@ public class JavaList extends LuaUserdata {
     private static final class LenFunction extends OneArgFunction {
 
         public LuaValue call(LuaValue u) {
-            return LuaValue.valueOf(((List<Object>)((LuaUserdata)u).m_instance).size());
+            return LuaValue.valueOf(((List<?>)((LuaUserdata)u).m_instance).size());
         }
 
     }

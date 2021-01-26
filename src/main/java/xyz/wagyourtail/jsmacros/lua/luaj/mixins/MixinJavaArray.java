@@ -6,6 +6,9 @@ import org.luaj.vm2.LuaValue;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xyz.wagyourtail.jsmacros.lua.luaj.JavaArrayIPairs;
 import xyz.wagyourtail.jsmacros.lua.luaj.Util;
 
@@ -20,9 +23,13 @@ public abstract class MixinJavaArray extends LuaUserdata {
     @Final
     static LuaTable array_metatable;
 
-    static {
-        array_metatable.rawset(Util.PAIRS, new JavaArrayIPairs());
-        array_metatable.rawset(Util.IPAIRS, new JavaArrayIPairs());
+    @Inject(method = "<init>", at = @At(value = "RETURN", remap = false))
+    public void setMetatableRedirect(Object instance, CallbackInfo ci) {
+        LuaTable t = new LuaTable();
+        t.rawset(LuaValue.LEN, array_metatable.rawget(LuaValue.LEN));
+        t.rawset(Util.PAIRS, new JavaArrayIPairs());
+        t.rawset(Util.IPAIRS, new JavaArrayIPairs());
+        setmetatable(t);
     }
 
     /*

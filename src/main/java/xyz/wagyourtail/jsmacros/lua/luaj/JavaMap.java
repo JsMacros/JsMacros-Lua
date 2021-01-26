@@ -13,37 +13,36 @@ import java.util.Map;
 
 public class JavaMap extends LuaUserdata {
 
-    static final LuaTable map_metatable = new LuaTable();
-    static {
-        map_metatable.rawset(Util.PAIRS, new MapPairs());
-    }
+    final LuaTable map_metatable = new LuaTable();
     
-    public JavaMap(Map<Object, Object> obj) {
+    public JavaMap(Map<?, ?> obj) {
         super(obj);
+        
+        map_metatable.rawset(Util.PAIRS, new MapPairs());
         setmetatable(map_metatable);
     }
 
     @Override
     public LuaValue get(LuaValue key) {
-        return CoerceJavaToLua.coerce(((Map<Object,Object>)m_instance).get(Util.autoCoerceLuaToJava(key)));
+        return CoerceJavaToLua.coerce(((Map<?,?>)m_instance).get(Util.autoCoerceLuaToJava(key)));
     }
 
     @Override
     public void set(LuaValue key, LuaValue value) {
-        ((Map<Object,Object>)m_instance).put(Util.autoCoerceLuaToJava(key), Util.autoCoerceLuaToJava(value));
+        ((Map)m_instance).put(Util.autoCoerceLuaToJava(key), Util.autoCoerceLuaToJava(value));
     }
 
     public static final class MapPairs extends VarArgFunction {
 
         @Override
         public Varargs invoke(Varargs args) {
-            Map<Object, Object> map  = (Map<Object, Object>) ((JavaMap) args.arg1()).m_instance;
+            Map<?, ?> map  = (Map<?, ?>) ((JavaMap) args.arg1()).m_instance;
             List<Object> keyset = Arrays.asList(map.keySet().toArray());
 
             return varargsOf(new VarArgFunction() {
                 @Override
                 public Varargs invoke(Varargs args) {
-                    Map<Object, Object> map  = (Map<Object, Object>) ((JavaMap) args.arg1()).m_instance;
+                    Map<?, ?> map  = (Map<?, ?>) ((JavaMap) args.arg1()).m_instance;
                     int index = keyset.indexOf(Util.autoCoerceLuaToJava(args.arg(2)));
                     if (++index < keyset.size()) {
                         Object next = keyset.get(index);

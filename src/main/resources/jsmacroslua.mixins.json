@@ -4,13 +4,14 @@
   "compatibilityLevel": "JAVA_8",
   "client": [
     "MixinCoerceJavaToLua",
-    "MixinPairs",
+    "MixinGlobals",
     "MixinIPairs",
     "MixinJavaArray",
+    "MixinLexState",
     "MixinLuaClosure",
     "MixinLuaError",
-    "MixinGlobals",
-    "MixinLexState"
+    "MixinPairs",
+    "MixinSetMetatable"
   ],
   "injectors": {
     "defaultRequire": 1
