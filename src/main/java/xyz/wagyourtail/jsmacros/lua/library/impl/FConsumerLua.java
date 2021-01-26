@@ -7,14 +7,14 @@ import xyz.wagyourtail.jsmacros.core.MethodWrapper;
 import xyz.wagyourtail.jsmacros.core.language.BaseLanguage;
 import xyz.wagyourtail.jsmacros.core.library.IFConsumer;
 import xyz.wagyourtail.jsmacros.core.library.Library;
-import xyz.wagyourtail.jsmacros.core.library.PerExecLanguageLibrary;
+import xyz.wagyourtail.jsmacros.core.library.PerLanguageLibrary;
 import xyz.wagyourtail.jsmacros.lua.language.impl.LuaLanguageDefinition;
 
 @Library(value = "consumer", languages = LuaLanguageDefinition.class)
-public class FConsumerLua extends PerExecLanguageLibrary<IFConsumer> implements IFConsumer<LuaClosure, LuaClosure, LuaClosure> {
+public class FConsumerLua extends PerLanguageLibrary implements IFConsumer<LuaClosure, LuaClosure, LuaClosure> {
     
-    public FConsumerLua(Class<? extends BaseLanguage> language, Object context, Thread thread) {
-        super(language, context, thread);
+    public FConsumerLua(Class<? extends BaseLanguage> language) {
+        super(language);
     }
     
     @Override
