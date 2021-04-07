@@ -30,8 +30,13 @@ public class FWrapper extends PerLanguageLibrary implements IFWrapper<LuaClosure
                     if (currentContext.closed) throw new RuntimeException("Context Closed");
                     Core.instance.threadContext.put(Thread.currentThread(), currentContext);
                 }
-                luaClosure.call(CoerceJavaToLua.coerce(a));
-                Core.instance.threadContext.remove(Thread.currentThread());
+                try {
+                    luaClosure.call(CoerceJavaToLua.coerce(a));
+                } finally {
+                    synchronized (currentContext) {
+                        Core.instance.threadContext.remove(Thread.currentThread());
+                    }
+                }
             }
     
             @Override
@@ -40,8 +45,13 @@ public class FWrapper extends PerLanguageLibrary implements IFWrapper<LuaClosure
                     if (currentContext.closed) throw new RuntimeException("Context Closed");
                     Core.instance.threadContext.put(Thread.currentThread(), currentContext);
                 }
-                luaClosure.call(CoerceJavaToLua.coerce(a), CoerceJavaToLua.coerce(b));
-                Core.instance.threadContext.remove(Thread.currentThread());
+                try {
+                    luaClosure.call(CoerceJavaToLua.coerce(a), CoerceJavaToLua.coerce(b));
+                } finally {
+                    synchronized (currentContext) {
+                        Core.instance.threadContext.remove(Thread.currentThread());
+                    }
+                }
             }
     
             @Override
@@ -53,7 +63,9 @@ public class FWrapper extends PerLanguageLibrary implements IFWrapper<LuaClosure
                 try {
                     return (R) CoerceLuaToJava.coerce(luaClosure.call(CoerceJavaToLua.coerce(a)), Object.class);
                 } finally {
-                    Core.instance.threadContext.remove(Thread.currentThread());
+                    synchronized (currentContext) {
+                        Core.instance.threadContext.remove(Thread.currentThread());
+                    }
                 }
             }
     
@@ -66,7 +78,9 @@ public class FWrapper extends PerLanguageLibrary implements IFWrapper<LuaClosure
                 try {
                     return (R) CoerceLuaToJava.coerce(luaClosure.call(CoerceJavaToLua.coerce(a), CoerceJavaToLua.coerce(b)), Object.class);
                 } finally {
-                    Core.instance.threadContext.remove(Thread.currentThread());
+                    synchronized (currentContext) {
+                        Core.instance.threadContext.remove(Thread.currentThread());
+                    }
                 }
             }
     
@@ -79,7 +93,9 @@ public class FWrapper extends PerLanguageLibrary implements IFWrapper<LuaClosure
                 try {
                     return luaClosure.call(CoerceJavaToLua.coerce(a)).toboolean();
                 } finally {
-                    Core.instance.threadContext.remove(Thread.currentThread());
+                    synchronized (currentContext) {
+                        Core.instance.threadContext.remove(Thread.currentThread());
+                    }
                 }
             }
     
@@ -92,7 +108,9 @@ public class FWrapper extends PerLanguageLibrary implements IFWrapper<LuaClosure
                 try {
                     return luaClosure.call(CoerceJavaToLua.coerce(a), CoerceJavaToLua.coerce(b)).toboolean();
                 } finally {
-                    Core.instance.threadContext.remove(Thread.currentThread());
+                    synchronized (currentContext) {
+                        Core.instance.threadContext.remove(Thread.currentThread());
+                    }
                 }
             }
     
@@ -105,7 +123,9 @@ public class FWrapper extends PerLanguageLibrary implements IFWrapper<LuaClosure
                 try {
                     luaClosure.call();
                 } finally {
-                    Core.instance.threadContext.remove(Thread.currentThread());
+                    synchronized (currentContext) {
+                        Core.instance.threadContext.remove(Thread.currentThread());
+                    }
                 }
             }
     
@@ -118,7 +138,9 @@ public class FWrapper extends PerLanguageLibrary implements IFWrapper<LuaClosure
                 try {
                     return luaClosure.call(CoerceJavaToLua.coerce(o1), CoerceJavaToLua.coerce(o2)).toint();
                 } finally {
-                    Core.instance.threadContext.remove(Thread.currentThread());
+                    synchronized (currentContext) {
+                        Core.instance.threadContext.remove(Thread.currentThread());
+                    }
                 }
             }
     
@@ -131,7 +153,9 @@ public class FWrapper extends PerLanguageLibrary implements IFWrapper<LuaClosure
                 try {
                     return (R) CoerceLuaToJava.coerce(luaClosure.call(), Object.class);
                 } finally {
-                    Core.instance.threadContext.remove(Thread.currentThread());
+                    synchronized (currentContext) {
+                        Core.instance.threadContext.remove(Thread.currentThread());
+                    }
                 }
             }
         };
@@ -149,7 +173,6 @@ public class FWrapper extends PerLanguageLibrary implements IFWrapper<LuaClosure
                         Core.instance.threadContext.put(Thread.currentThread(), currentContext);
                     }
                     luaClosure.call(CoerceJavaToLua.coerce(a));
-                    Core.instance.threadContext.remove(Thread.currentThread());
                 }).start();
             }
         
@@ -161,7 +184,6 @@ public class FWrapper extends PerLanguageLibrary implements IFWrapper<LuaClosure
                         Core.instance.threadContext.put(Thread.currentThread(), currentContext);
                     }
                     luaClosure.call(CoerceJavaToLua.coerce(a), CoerceJavaToLua.coerce(b));
-                    Core.instance.threadContext.remove(Thread.currentThread());
                 }).start();
             }
         
@@ -174,7 +196,9 @@ public class FWrapper extends PerLanguageLibrary implements IFWrapper<LuaClosure
                 try {
                     return (R) CoerceLuaToJava.coerce(luaClosure.call(CoerceJavaToLua.coerce(a)), Object.class);
                 } finally {
-                    Core.instance.threadContext.remove(Thread.currentThread());
+                    synchronized (currentContext) {
+                        Core.instance.threadContext.remove(Thread.currentThread());
+                    }
                 }
             }
         
@@ -187,7 +211,9 @@ public class FWrapper extends PerLanguageLibrary implements IFWrapper<LuaClosure
                 try {
                     return (R) CoerceLuaToJava.coerce(luaClosure.call(CoerceJavaToLua.coerce(a), CoerceJavaToLua.coerce(b)), Object.class);
                 } finally {
-                    Core.instance.threadContext.remove(Thread.currentThread());
+                    synchronized (currentContext) {
+                        Core.instance.threadContext.remove(Thread.currentThread());
+                    }
                 }
             }
         
@@ -200,7 +226,9 @@ public class FWrapper extends PerLanguageLibrary implements IFWrapper<LuaClosure
                 try {
                     return luaClosure.call(CoerceJavaToLua.coerce(a)).toboolean();
                 } finally {
-                    Core.instance.threadContext.remove(Thread.currentThread());
+                    synchronized (currentContext) {
+                        Core.instance.threadContext.remove(Thread.currentThread());
+                    }
                 }
             }
         
@@ -213,7 +241,9 @@ public class FWrapper extends PerLanguageLibrary implements IFWrapper<LuaClosure
                 try {
                     return luaClosure.call(CoerceJavaToLua.coerce(a), CoerceJavaToLua.coerce(b)).toboolean();
                 } finally {
-                    Core.instance.threadContext.remove(Thread.currentThread());
+                    synchronized (currentContext) {
+                        Core.instance.threadContext.remove(Thread.currentThread());
+                    }
                 }
             }
         
@@ -225,7 +255,6 @@ public class FWrapper extends PerLanguageLibrary implements IFWrapper<LuaClosure
                         Core.instance.threadContext.put(Thread.currentThread(), currentContext);
                     }
                     luaClosure.call();
-                    Core.instance.threadContext.remove(Thread.currentThread());
                 }).start();
             }
         
@@ -238,7 +267,9 @@ public class FWrapper extends PerLanguageLibrary implements IFWrapper<LuaClosure
                 try {
                     return luaClosure.call(CoerceJavaToLua.coerce(o1), CoerceJavaToLua.coerce(o2)).toint();
                 } finally {
-                    Core.instance.threadContext.remove(Thread.currentThread());
+                    synchronized (currentContext) {
+                        Core.instance.threadContext.remove(Thread.currentThread());
+                    }
                 }
             }
         
@@ -251,7 +282,9 @@ public class FWrapper extends PerLanguageLibrary implements IFWrapper<LuaClosure
                 try {
                     return (R) CoerceLuaToJava.coerce(luaClosure.call(), Object.class);
                 } finally {
-                    Core.instance.threadContext.remove(Thread.currentThread());
+                    synchronized (currentContext) {
+                        Core.instance.threadContext.remove(Thread.currentThread());
+                    }
                 }
             }
         };
