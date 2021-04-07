@@ -4,8 +4,9 @@ import net.fabricmc.api.ClientModInitializer;
 import org.luaj.vm2.Globals;
 import org.luaj.vm2.lib.jse.JsePlatform;
 import xyz.wagyourtail.jsmacros.client.JsMacros;
+import xyz.wagyourtail.jsmacros.lua.config.LuaConfig;
 import xyz.wagyourtail.jsmacros.lua.language.impl.LuaLanguageDefinition;
-import xyz.wagyourtail.jsmacros.lua.library.impl.FConsumerLua;
+import xyz.wagyourtail.jsmacros.lua.library.impl.FWrapper;
 
 public class JsMacrosLua implements ClientModInitializer {
     
@@ -14,8 +15,14 @@ public class JsMacrosLua implements ClientModInitializer {
         
         JsMacros.core.addLanguage(new LuaLanguageDefinition(".lua", JsMacros.core));
         JsMacros.core.sortLanguages();
-        JsMacros.core.libraryRegistry.addLibrary(FConsumerLua.class);
-        
+        JsMacros.core.libraryRegistry.addLibrary(FWrapper.class);
+    
+        try {
+            JsMacros.core.config.addOptions("lua", LuaConfig.class);
+        } catch (IllegalAccessException | InstantiationException e) {
+            throw new RuntimeException(e);
+        }
+    
         // pre-init
         Thread t = new Thread(() -> {
             try {

@@ -9,39 +9,52 @@ import xyz.wagyourtail.jsmacros.core.config.ScriptTrigger;
 import xyz.wagyourtail.jsmacros.core.event.BaseEvent;
 import xyz.wagyourtail.jsmacros.core.language.BaseLanguage;
 import xyz.wagyourtail.jsmacros.core.language.BaseWrappedException;
+import xyz.wagyourtail.jsmacros.core.language.ContextContainer;
+import xyz.wagyourtail.jsmacros.core.language.ScriptContext;
+import xyz.wagyourtail.jsmacros.lua.config.LuaConfig;
 import xyz.wagyourtail.jsmacros.lua.luaj.ILuaError;
 
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Map;
 
-public class LuaLanguageDefinition extends BaseLanguage {
+public class LuaLanguageDefinition extends BaseLanguage<Globals> {
+
+    public final Globals globalGlobals = JsePlatform.standardGlobals();
 
     public LuaLanguageDefinition(String extension, Core runner) {
         super(extension, runner);
     }
     
-    protected void execContext(Executor e) throws Exception {
-        Globals globals = JsePlatform.standardGlobals();
-        retrieveLibs(globals).forEach((name, lib) -> globals.set(name, CoerceJavaToLua.coerce(lib)));
+    protected void execContext(ContextContainer<Globals> ctx, Executor e) throws Exception {
+        Globals globals;
+        
+        if (runner.config.getOptions(LuaConfig.class).useGlobalContext) globals = globalGlobals;
+        else globals = JsePlatform.standardGlobals();
+        
+        ctx.getCtx().setContext(globals);
+        retrieveLibs(ctx).forEach((name, lib) -> globals.set(name, CoerceJavaToLua.coerce(lib)));
         
         e.accept(globals);
     }
     
     @Override
-    public void exec(ScriptTrigger scriptTrigger, File file, BaseEvent baseEvent) throws Exception {
-        execContext((globals) -> {
+    public void exec(ContextContainer<Globals> ctx, ScriptTrigger scriptTrigger, File file, BaseEvent baseEvent) throws Exception {
+        execContext(ctx, (globals) -> {
             globals.set("event", CoerceJavaToLua.coerce(baseEvent));
             globals.set("file", CoerceJavaToLua.coerce(file));
+            globals.set("context", CoerceJavaToLua.coerce(ctx));
     
             globals.loadfile(file.getCanonicalPath()).call();
         });
     }
     
     @Override
-    public void exec(String s, Map<String, Object> map, Path path) throws Exception {
-        execContext((globals) -> {
+    public void exec(ContextContainer<Globals> ctx, String s, Map<String, Object> map, Path path) throws Exception {
+        execContext(ctx, (globals) -> {
+        
             map.forEach((name, lib) -> globals.set(name, CoerceJavaToLua.coerce(lib)));
+            globals.set("context", CoerceJavaToLua.coerce(ctx));
         
             globals.load(s).call();
         });
@@ -64,6 +77,11 @@ public class LuaLanguageDefinition extends BaseLanguage {
             }
             return new BaseWrappedException<>(ex, error, loc, causewrap);
         }
+        return null;
+    }
+    
+    @Override
+    public ScriptContext<Globals> createContext() {
         return null;
     }
     
