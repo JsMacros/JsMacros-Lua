@@ -1,7 +1,6 @@
 package xyz.wagyourtail.jsmacros.lua.language.impl;
 
-import org.luaj.vm2.Globals;
-import org.luaj.vm2.LuaError;
+import org.luaj.vm2.*;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 import org.luaj.vm2.lib.jse.JsePlatform;
 import xyz.wagyourtail.jsmacros.core.Core;
@@ -31,32 +30,45 @@ public class LuaLanguageDefinition extends BaseLanguage<Globals> {
         
         if (runner.config.getOptions(LuaConfig.class).useGlobalContext) globals = globalGlobals;
         else globals = JsePlatform.standardGlobals();
-        
         ctx.getCtx().setContext(globals);
+    
         retrieveLibs(ctx).forEach((name, lib) -> globals.set(name, CoerceJavaToLua.coerce(lib)));
         
         e.accept(globals);
     }
     
-    @Override
-    public void exec(ContextContainer<Globals> ctx, ScriptTrigger scriptTrigger, File file, BaseEvent baseEvent) throws Exception {
-        execContext(ctx, (globals) -> {
-            globals.set("event", CoerceJavaToLua.coerce(baseEvent));
-            globals.set("file", CoerceJavaToLua.coerce(file));
-            globals.set("context", CoerceJavaToLua.coerce(ctx));
+    private void setPerExecVar(ScriptContext<?> ctx, Globals globals, String name, LuaValue val) {
+        if (!(globals.get(name) instanceof PerContextLuaValue)) {
+            globals.set(name, new PerContextLuaValue());
+        }
+        ((PerContextLuaValue) globals.get(name)).addContext(ctx, val);
+    }
     
-            globals.loadfile(file.getCanonicalPath()).call();
+    @Override
+    protected void exec(ContextContainer<Globals> ctx, ScriptTrigger scriptTrigger, File file, BaseEvent baseEvent) throws Exception {
+        execContext(ctx, (globals) -> {
+            setPerExecVar(ctx.getCtx(), globals, "event", CoerceJavaToLua.coerce(baseEvent));
+            setPerExecVar(ctx.getCtx(), globals, "file", CoerceJavaToLua.coerce(file));
+            setPerExecVar(ctx.getCtx(), globals, "context", CoerceJavaToLua.coerce(ctx));
+            
+            retrieveOnceLibs().forEach((name, lib) -> globals.set(name, CoerceJavaToLua.coerce(lib)));
+            
+            retrievePerExecLibs(ctx).forEach((name, lib) -> setPerExecVar(ctx.getCtx(), globals, name, CoerceJavaToLua.coerce(lib)));
+            
+            LuaClosure current = (LuaClosure) globals.loadfile(file.getCanonicalPath());
+            current.call();
         });
     }
     
     @Override
-    public void exec(ContextContainer<Globals> ctx, String s, Map<String, Object> map, Path path) throws Exception {
+    protected void exec(ContextContainer<Globals> ctx, String s, Map<String, Object> map, Path path) throws Exception {
         execContext(ctx, (globals) -> {
         
-            map.forEach((name, lib) -> globals.set(name, CoerceJavaToLua.coerce(lib)));
-            globals.set("context", CoerceJavaToLua.coerce(ctx));
-        
-            globals.load(s).call();
+            map.forEach((name, lib) -> setPerExecVar(ctx.getCtx(), globals, name, CoerceJavaToLua.coerce(lib)));
+            setPerExecVar(ctx.getCtx(), globals, "context", CoerceJavaToLua.coerce(ctx));
+    
+            LuaValue current = globals.load(s);
+            current.call();
         });
     }
     
