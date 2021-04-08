@@ -38,10 +38,10 @@ public class LuaLanguageDefinition extends BaseLanguage<Globals> {
     }
     
     private void setPerExecVar(ScriptContext<?> ctx, Globals globals, String name, LuaValue val) {
-        if (!(globals.get(name) instanceof PerContextLuaValue)) {
-            globals.set(name, new PerContextLuaValue());
-        }
-        ((PerContextLuaValue) globals.get(name)).addContext(ctx, val);
+        boolean put = globals.rawget(name) instanceof PerContextLuaValue;
+        PerContextLuaValue pclv = put ? (PerContextLuaValue) globals.rawget(name) : new PerContextLuaValue();
+        pclv.addContext(ctx, val);
+        if (!put) globals.rawset(name, pclv);
     }
     
     @Override
