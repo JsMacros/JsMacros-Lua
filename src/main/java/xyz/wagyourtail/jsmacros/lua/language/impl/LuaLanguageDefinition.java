@@ -93,8 +93,8 @@ public class LuaLanguageDefinition extends BaseLanguage<Globals> {
     }
     
     @Override
-    public ScriptContext<Globals> createContext() {
-        return new LuaScriptContext();
+    public ScriptContext<Globals> createContext(BaseEvent event) {
+        return new LuaScriptContext(event);
     }
     
     private interface Executor {

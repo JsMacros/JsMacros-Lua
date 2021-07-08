@@ -23,41 +23,14 @@ jobs:
         with:
           ref: master
 
-      - name: Set up JDK 1.8
-        uses: actions/setup-java@v1
+      - name: Set up JDK 16
+        uses: actions/setup-java@v2
         with:
-          java-version: 1.8
+          distribution: 'adopt'
+          java-version: '16'
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-
-      - name: Get Js Macros
-        uses: benday-inc/download-latest-artifact@main
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          repository_owner: 'wagyourtail'
-          repository_name: 'jsmacros'
-          workflow_name: 'Build Beta'
-          branch_name: 'master'
-          download_path: '${{ github.workspace }}/libs'
-          download_filename: 'jsmacros.zip'
-      - name: UnZip Js Macros
-        uses: TonyBogdanov/zip@1.0
-        with:
-          args: unzip -qq ./libs/jsmacros.zip -d ./libs
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      - uses: actions/github-script@v2
-        id: jsmvers
-        with:
-          result-encoding: string
-          script: |
-            const fs = require("fs")
-            let version = fs.readdirSync("./libs/").filter(e => !e.endsWith("dev.jar") && !e.endsWith("sources.jar") && e.endsWith(".jar"))[0].replace(".jar", "").replace(/jsmacros-.+?-/, "");
-            let file = fs.readFileSync("./gradle.properties");
-            file = file.toString().split("\n").map(e => e.trim().startsWith("jsmacros_version") ? `${e.split("=")[0]}=${version}` : e).join("\n");
-            fs.writeFileSync("./gradle.properties", file)
 
       - name: Build with Gradle
         run: ./gradlew build
@@ -85,7 +58,7 @@ jobs:
           file_path: ./build/libs/${{ steps.fname.outputs.result }}.jar
           changelog: See the github release for changes.
           display_name: ${{ steps.fname.outputs.result }}
-          game_versions: 70886:1.16.4,70886:1.16.3,70886:1.16.2,68722:1.15.2,64806:1.14.4,2:Java 8,68441:Fabric
+          game_versions: 73242:1.17.1,70886:1.16.5,70886:1.16.4,70886:1.16.3,70886:1.16.2,68722:1.15.2,64806:1.14.4,2:Java 8,68441:Fabric
           release_type: release
           relations: modmenu:optionalDependency,jsmacros:requiredDependency
       - uses: actions/upload-artifact@v2

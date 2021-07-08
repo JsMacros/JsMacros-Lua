@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '0.4-SNAPSHOT'
+	id 'fabric-loom' version '0.8-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -14,12 +14,13 @@ repositories {
    flatDir {
        dirs 'libs'
    }
-    mavenCentral()
     maven {
         name "Modmuss50 Repository"
         url 'https://maven.fabricmc.net/'
     }
+    mavenCentral()
     maven { url 'https://jitpack.io' }
+    maven { url 'https://www.cursemaven.com' }
 }
 
 dependencies {
@@ -28,49 +29,27 @@ dependencies {
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	
-	modImplementation "jsmacros-1.16.5:jsmacros-1.16.5:${project.jsmacros_version}:dev"
+	modImplementation "com.github.wagyourtail:JsMacros:${project.jsmacros_version}"
 
 	modImplementation "luaj-jse:luaj-jse:${project.luaj_version}"
 	include "luaj-jse:luaj-jse:${project.luaj_version}"
 
-	//partial fabric api
-	modImplementation "net.fabricmc.fabric-api:fabric-api-base:${project.api_base_version}"
-	modImplementation "net.fabricmc.fabric-api:fabric-lifecycle-events-v1:${project.lifecycle_events_version}"
-    modImplementation "net.fabricmc.fabric-api:fabric-key-binding-api-v1:${project.key_bind_api_version}"
-    modImplementation "net.fabricmc.fabric-api:fabric-resource-loader-v0:${resource_loader_version}"
-	
 	// https://mvnrepository.com/artifact/org.graalvm.js/js
 	implementation group: 'org.graalvm.sdk', name: 'graal-sdk', version: '20.1.0'
 	implementation group: 'org.graalvm.js', name: 'js', version: '20.1.0'
-	
-	//these ones are needed to build the mod because doesn't auto include sub-dependencies
-	implementation group: 'org.graalvm.truffle', name: 'truffle-api', version: '20.1.0'
-	implementation group: 'org.graalvm.regex', name: 'regex', version: '20.1.0'
-	implementation group: 'com.ibm.icu', name: 'icu4j', version: '64.2'
-	
-	
-    //websocket
-    implementation "com.neovisionaries:nv-websocket-client:2.10"
-    
+
 	//nullable not defined so...
 	implementation 'com.google.code.findbugs:jsr305:3.0.2'
 
-	implementation "io.noties:prism4j:${prism_version}"
-
-	// PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
-	// You may need to force-disable transitiveness on them.
+	//for modmenu
+	modImplementation "net.fabricmc.fabric-api:fabric-screen-api-v1:1.0.4+155f865c13"
 }
 
 processResources {
 	inputs.property "version", project.version
 
-	from(sourceSets.main.resources.srcDirs) {
-		include "fabric.mod.json"
+	filesMatching("fabric.mod.json") {
 		expand "version": project.version
-	}
-
-	from(sourceSets.main.resources.srcDirs) {
-		exclude "fabric.mod.json"
 	}
 }
 

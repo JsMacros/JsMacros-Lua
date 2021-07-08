@@ -2,11 +2,16 @@ package xyz.wagyourtail.jsmacros.lua.language.impl;
 
 import org.luaj.vm2.Globals;
 import xyz.wagyourtail.jsmacros.core.Core;
+import xyz.wagyourtail.jsmacros.core.event.BaseEvent;
 import xyz.wagyourtail.jsmacros.core.language.ScriptContext;
 
 public class LuaScriptContext extends ScriptContext<Globals> {
     public boolean closed = false;
-    
+
+    public LuaScriptContext(BaseEvent event) {
+        super(event);
+    }
+
     @Override
     public boolean isContextClosed() {
         return super.isContextClosed() || closed;
