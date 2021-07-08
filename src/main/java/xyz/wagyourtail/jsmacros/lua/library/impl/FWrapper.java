@@ -28,7 +28,7 @@ public class FWrapper extends PerLanguageLibrary implements IFWrapper<LuaClosure
         LuaScriptContext currentContext = (LuaScriptContext) JsMacros.core.threadContext.get(Thread.currentThread());
         return new LuaMethodWrapper<>(luaClosure, true, currentContext);
     }
-    
+
     @Override
     public <A, B, R> MethodWrapper<A, B, R> methodToJavaAsync(LuaClosure luaClosure) {
         LuaScriptContext currentContext = (LuaScriptContext) JsMacros.core.threadContext.get(Thread.currentThread());
@@ -56,6 +56,12 @@ public class FWrapper extends PerLanguageLibrary implements IFWrapper<LuaClosure
         private void internal_accept(Runnable accepted, boolean await) {
             Throwable[] error = {null};
             Semaphore lock = new Semaphore(0);
+
+            // if in the same lua context and not async...
+            if (Core.instance.threadContext.get(Thread.currentThread()) == ctx && await) {
+                accepted.run();
+                return;
+            }
 
             Thread th = new Thread(() -> {
                 try {
