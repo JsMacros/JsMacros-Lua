@@ -26,12 +26,14 @@ public class FWrapper extends PerLanguageLibrary implements IFWrapper<LuaClosure
     @Override
     public <A, B, R> MethodWrapper<A, B, R> methodToJava(LuaClosure luaClosure) {
         LuaScriptContext currentContext = (LuaScriptContext) JsMacros.core.threadContext.get(Thread.currentThread());
+        currentContext.nonGCdMethodWrappers.incrementAndGet();
         return new LuaMethodWrapper<>(luaClosure, true, currentContext);
     }
 
     @Override
     public <A, B, R> MethodWrapper<A, B, R> methodToJavaAsync(LuaClosure luaClosure) {
         LuaScriptContext currentContext = (LuaScriptContext) JsMacros.core.threadContext.get(Thread.currentThread());
+        currentContext.nonGCdMethodWrappers.incrementAndGet();
         return new LuaMethodWrapper<>(luaClosure, false, currentContext);
     }
     
@@ -104,7 +106,7 @@ public class FWrapper extends PerLanguageLibrary implements IFWrapper<LuaClosure
         @Override
         public R apply(T t) {
             Object[] retval = {null};
-            internal_accept(() -> retval[0] = (R) CoerceLuaToJava.coerce(fn.call(CoerceJavaToLua.coerce(t)), Object.class), true);
+            internal_accept(() -> retval[0] = CoerceLuaToJava.coerce(fn.call(CoerceJavaToLua.coerce(t)), Object.class), true);
             return (R) retval[0];
         }
 
@@ -148,5 +150,10 @@ public class FWrapper extends PerLanguageLibrary implements IFWrapper<LuaClosure
             return (R) retval[0];
         }
 
+        @Override
+        protected void finalize() throws Throwable {
+            int val = ((LuaScriptContext) ctx).nonGCdMethodWrappers.decrementAndGet();
+            if (val == 0) ctx.closeContext();
+        }
     }
 }

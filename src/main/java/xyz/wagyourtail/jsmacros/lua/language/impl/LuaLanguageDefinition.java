@@ -35,6 +35,10 @@ public class LuaLanguageDefinition extends BaseLanguage<Globals> {
         retrieveLibs(ctx).forEach((name, lib) -> globals.set(name, CoerceJavaToLua.coerce(lib)));
         
         e.accept(globals);
+
+        if (((LuaScriptContext)ctx.getCtx()).nonGCdMethodWrappers.get() == 0) {
+            ctx.getCtx().closeContext();
+        }
     }
     
     private void setPerExecVar(ScriptContext<?> ctx, Globals globals, String name, LuaValue val) {
