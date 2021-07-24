@@ -19,7 +19,7 @@ import java.util.Map;
 
 public class LuaLanguageDefinition extends BaseLanguage<Globals> {
 
-    public final Globals globalGlobals = JsePlatform.standardGlobals();
+    public final Globals globalGlobals = JsePlatform.debugGlobals();
 
     public LuaLanguageDefinition(String extension, Core runner) {
         super(extension, runner);
@@ -29,7 +29,7 @@ public class LuaLanguageDefinition extends BaseLanguage<Globals> {
         Globals globals;
         
         if (runner.config.getOptions(LuaConfig.class).useGlobalContext) globals = globalGlobals;
-        else globals = JsePlatform.standardGlobals();
+        else globals = JsePlatform.debugGlobals();
         ctx.getCtx().setContext(globals);
     
         retrieveLibs(ctx).forEach((name, lib) -> globals.set(name, CoerceJavaToLua.coerce(lib)));
