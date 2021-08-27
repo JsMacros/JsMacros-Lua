@@ -35,8 +35,8 @@ dependencies {
 	include "luaj-jse:luaj-jse:${project.luaj_version}"
 
 	// https://mvnrepository.com/artifact/org.graalvm.js/js
-	implementation group: 'org.graalvm.sdk', name: 'graal-sdk', version: '20.1.0'
-	implementation group: 'org.graalvm.js', name: 'js', version: '20.1.0'
+	implementation group: 'org.graalvm.sdk', name: 'graal-sdk', version: '21.2.0'
+	implementation group: 'org.graalvm.js', name: 'js', version: '21.2.0'
 
 	//nullable not defined so...
 	implementation 'com.google.code.findbugs:jsr305:3.0.2'

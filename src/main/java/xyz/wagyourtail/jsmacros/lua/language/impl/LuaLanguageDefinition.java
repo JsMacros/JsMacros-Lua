@@ -1,20 +1,22 @@
 package xyz.wagyourtail.jsmacros.lua.language.impl;
 
-import org.luaj.vm2.*;
+import org.luaj.vm2.Globals;
+import org.luaj.vm2.LuaClosure;
+import org.luaj.vm2.LuaError;
+import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 import org.luaj.vm2.lib.jse.JsePlatform;
 import xyz.wagyourtail.jsmacros.core.Core;
 import xyz.wagyourtail.jsmacros.core.config.ScriptTrigger;
 import xyz.wagyourtail.jsmacros.core.event.BaseEvent;
 import xyz.wagyourtail.jsmacros.core.language.BaseLanguage;
+import xyz.wagyourtail.jsmacros.core.language.BaseScriptContext;
 import xyz.wagyourtail.jsmacros.core.language.BaseWrappedException;
-import xyz.wagyourtail.jsmacros.core.language.ContextContainer;
-import xyz.wagyourtail.jsmacros.core.language.ScriptContext;
+import xyz.wagyourtail.jsmacros.core.language.EventContainer;
 import xyz.wagyourtail.jsmacros.lua.config.LuaConfig;
 import xyz.wagyourtail.jsmacros.lua.luaj.ILuaError;
 
 import java.io.File;
-import java.nio.file.Path;
 import java.util.Map;
 
 public class LuaLanguageDefinition extends BaseLanguage<Globals> {
@@ -25,23 +27,19 @@ public class LuaLanguageDefinition extends BaseLanguage<Globals> {
         super(extension, runner);
     }
     
-    protected void execContext(ContextContainer<Globals> ctx, Executor e) throws Exception {
+    protected void execContext(EventContainer<Globals> ctx, Executor e) throws Exception {
         Globals globals;
         
         if (runner.config.getOptions(LuaConfig.class).useGlobalContext) globals = globalGlobals;
         else globals = JsePlatform.debugGlobals();
         ctx.getCtx().setContext(globals);
     
-        retrieveLibs(ctx).forEach((name, lib) -> globals.set(name, CoerceJavaToLua.coerce(lib)));
+        retrieveLibs(ctx.getCtx()).forEach((name, lib) -> globals.set(name, CoerceJavaToLua.coerce(lib)));
         
         e.accept(globals);
-
-        if (((LuaScriptContext)ctx.getCtx()).nonGCdMethodWrappers.get() == 0) {
-            ctx.getCtx().closeContext();
-        }
     }
     
-    private void setPerExecVar(ScriptContext<?> ctx, Globals globals, String name, LuaValue val) {
+    private void setPerExecVar(BaseScriptContext<?> ctx, Globals globals, String name, LuaValue val) {
         boolean put = globals.rawget(name) instanceof PerContextLuaValue;
         PerContextLuaValue pclv = put ? (PerContextLuaValue) globals.rawget(name) : new PerContextLuaValue();
         pclv.addContext(ctx, val);
@@ -49,29 +47,29 @@ public class LuaLanguageDefinition extends BaseLanguage<Globals> {
     }
     
     @Override
-    protected void exec(ContextContainer<Globals> ctx, ScriptTrigger scriptTrigger, File file, BaseEvent baseEvent) throws Exception {
+    protected void exec(EventContainer<Globals> ctx, ScriptTrigger macro, BaseEvent event) throws Exception {
         execContext(ctx, (globals) -> {
-            setPerExecVar(ctx.getCtx(), globals, "event", CoerceJavaToLua.coerce(baseEvent));
-            setPerExecVar(ctx.getCtx(), globals, "file", CoerceJavaToLua.coerce(file));
+            setPerExecVar(ctx.getCtx(), globals, "event", CoerceJavaToLua.coerce(event));
+            setPerExecVar(ctx.getCtx(), globals, "file", CoerceJavaToLua.coerce(ctx.getCtx().getFile()));
             setPerExecVar(ctx.getCtx(), globals, "context", CoerceJavaToLua.coerce(ctx));
             
             retrieveOnceLibs().forEach((name, lib) -> globals.set(name, CoerceJavaToLua.coerce(lib)));
             
-            retrievePerExecLibs(ctx).forEach((name, lib) -> setPerExecVar(ctx.getCtx(), globals, name, CoerceJavaToLua.coerce(lib)));
+            retrievePerExecLibs(ctx.getCtx()).forEach((name, lib) -> setPerExecVar(ctx.getCtx(), globals, name, CoerceJavaToLua.coerce(lib)));
             
-            LuaClosure current = (LuaClosure) globals.loadfile(file.getCanonicalPath());
+            LuaClosure current = (LuaClosure) globals.loadfile(ctx.getCtx().getFile().getCanonicalPath());
             current.call();
         });
     }
     
     @Override
-    protected void exec(ContextContainer<Globals> ctx, String s, Map<String, Object> map, Path path) throws Exception {
+    protected void exec(EventContainer<Globals> ctx, String script, Map<String, Object> map) throws Exception {
         execContext(ctx, (globals) -> {
         
             map.forEach((name, lib) -> setPerExecVar(ctx.getCtx(), globals, name, CoerceJavaToLua.coerce(lib)));
             setPerExecVar(ctx.getCtx(), globals, "context", CoerceJavaToLua.coerce(ctx));
     
-            LuaValue current = globals.load(s);
+            LuaValue current = globals.load(script);
             current.call();
         });
     }
@@ -97,8 +95,8 @@ public class LuaLanguageDefinition extends BaseLanguage<Globals> {
     }
     
     @Override
-    public ScriptContext<Globals> createContext(BaseEvent event) {
-        return new LuaScriptContext(event);
+    public BaseScriptContext<Globals> createContext(BaseEvent event, File file) {
+        return new LuaScriptContext(event, file);
     }
     
     private interface Executor {

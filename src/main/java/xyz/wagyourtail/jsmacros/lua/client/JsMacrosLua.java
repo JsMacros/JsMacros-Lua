@@ -14,7 +14,6 @@ public class JsMacrosLua implements ClientModInitializer {
     public void onInitializeClient() {
         
         JsMacros.core.addLanguage(new LuaLanguageDefinition(".lua", JsMacros.core));
-        JsMacros.core.sortLanguages();
         JsMacros.core.libraryRegistry.addLibrary(FWrapper.class);
     
         try {

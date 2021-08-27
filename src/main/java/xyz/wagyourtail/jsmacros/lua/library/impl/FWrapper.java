@@ -1,58 +1,51 @@
 package xyz.wagyourtail.jsmacros.lua.library.impl;
 
+import org.luaj.vm2.Globals;
 import org.luaj.vm2.LuaClosure;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 import org.luaj.vm2.lib.jse.CoerceLuaToJava;
-import xyz.wagyourtail.jsmacros.client.JsMacros;
 import xyz.wagyourtail.jsmacros.core.Core;
 import xyz.wagyourtail.jsmacros.core.MethodWrapper;
-import xyz.wagyourtail.jsmacros.core.language.BaseLanguage;
-import xyz.wagyourtail.jsmacros.core.language.ContextContainer;
+import xyz.wagyourtail.jsmacros.core.language.BaseScriptContext;
+import xyz.wagyourtail.jsmacros.core.language.EventContainer;
 import xyz.wagyourtail.jsmacros.core.library.IFWrapper;
 import xyz.wagyourtail.jsmacros.core.library.Library;
-import xyz.wagyourtail.jsmacros.core.library.PerLanguageLibrary;
+import xyz.wagyourtail.jsmacros.core.library.PerExecLanguageLibrary;
 import xyz.wagyourtail.jsmacros.lua.language.impl.LuaLanguageDefinition;
-import xyz.wagyourtail.jsmacros.lua.language.impl.LuaScriptContext;
 
 import java.util.concurrent.Semaphore;
 
 @Library(value = "JavaWrapper", languages = LuaLanguageDefinition.class)
-public class FWrapper extends PerLanguageLibrary implements IFWrapper<LuaClosure> {
-    
-    public FWrapper(Class<? extends BaseLanguage<?>> language) {
-        super(language);
-    }
-    
-    @Override
-    public <A, B, R> MethodWrapper<A, B, R> methodToJava(LuaClosure luaClosure) {
-        LuaScriptContext currentContext = (LuaScriptContext) JsMacros.core.threadContext.get(Thread.currentThread());
-        currentContext.nonGCdMethodWrappers.incrementAndGet();
-        return new LuaMethodWrapper<>(luaClosure, true, currentContext);
+public class FWrapper extends PerExecLanguageLibrary<Globals> implements IFWrapper<LuaClosure> {
+
+    public FWrapper(BaseScriptContext context, Class language) {
+        super(context, language);
     }
 
     @Override
-    public <A, B, R> MethodWrapper<A, B, R> methodToJavaAsync(LuaClosure luaClosure) {
-        LuaScriptContext currentContext = (LuaScriptContext) JsMacros.core.threadContext.get(Thread.currentThread());
-        currentContext.nonGCdMethodWrappers.incrementAndGet();
-        return new LuaMethodWrapper<>(luaClosure, false, currentContext);
+    public <A, B, R> MethodWrapper<A, B, R, BaseScriptContext<Globals>> methodToJava(LuaClosure luaClosure) {
+        return new LuaMethodWrapper<>(luaClosure, true, ctx);
+    }
+
+    @Override
+    public <A, B, R> MethodWrapper<A, B, R, BaseScriptContext<Globals>> methodToJavaAsync(LuaClosure luaClosure) {
+        return new LuaMethodWrapper<>(luaClosure, false, ctx);
     }
     
     @Override
     public void stop() {
-        LuaScriptContext currentContext = (LuaScriptContext) JsMacros.core.threadContext.get(Thread.currentThread());
-        currentContext.closeContext();
+        ctx.closeContext();
     }
 
 
-    private static class LuaMethodWrapper<T, U, R> extends MethodWrapper<T, U, R> {
+    private static class LuaMethodWrapper<T, U, R> extends MethodWrapper<T, U, R, BaseScriptContext<Globals>> {
         private final LuaClosure fn;
         private final boolean await;
-        private final LuaScriptContext ctx;
 
-        LuaMethodWrapper(LuaClosure fn, boolean await, LuaScriptContext ctx) {
+        LuaMethodWrapper(LuaClosure fn, boolean await, BaseScriptContext<Globals> ctx) {
+            super(ctx);
             this.fn = fn;
             this.await = await;
-            this.ctx = ctx;
         }
 
         private void internal_accept(Runnable accepted, boolean await) {
@@ -60,14 +53,14 @@ public class FWrapper extends PerLanguageLibrary implements IFWrapper<LuaClosure
             Semaphore lock = new Semaphore(0);
 
             // if in the same lua context and not async...
-            if (Core.instance.threadContext.get(Thread.currentThread()) == ctx && await) {
+            if (ctx.getBoundThreads().contains(Thread.currentThread()) && await) {
                 accepted.run();
                 return;
             }
 
             Thread th = new Thread(() -> {
                 try {
-                    Core.instance.threadContext.put(Thread.currentThread(), ctx);
+                    ctx.bindThread(Thread.currentThread());
                     accepted.run();
                 } catch (Throwable ex) {
                     if (!await) {
@@ -75,7 +68,7 @@ public class FWrapper extends PerLanguageLibrary implements IFWrapper<LuaClosure
                     }
                     error[0] = ex;
                 } finally {
-                    ContextContainer<?> cc = Core.instance.eventContexts.get(Thread.currentThread());
+                    EventContainer<?> cc = ctx.getBoundEvents().get(Thread.currentThread());
                     if (cc != null) cc.releaseLock();
 
                     lock.release();
@@ -148,12 +141,6 @@ public class FWrapper extends PerLanguageLibrary implements IFWrapper<LuaClosure
             Object[] retval = {null};
             internal_accept(() -> retval[0] = CoerceLuaToJava.coerce(fn.call(), Object.class), true);
             return (R) retval[0];
-        }
-
-        @Override
-        protected void finalize() throws Throwable {
-            int val = ((LuaScriptContext) ctx).nonGCdMethodWrappers.decrementAndGet();
-            if (val == 0) ctx.closeContext();
         }
     }
 }
