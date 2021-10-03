@@ -51,16 +51,24 @@ public class FWrapper extends PerExecLanguageLibrary<Globals> implements IFWrapp
         private void internal_accept(Runnable accepted, boolean await) {
             Throwable[] error = {null};
             Semaphore lock = new Semaphore(0);
+            boolean joinedThread = Core.instance.profile.checkJoinedThreadStack();
 
             // if in the same lua context and not async...
-            if (ctx.getBoundThreads().contains(Thread.currentThread()) && await) {
-                accepted.run();
-                return;
+            if (await) {
+                if (ctx.getBoundThreads().contains(Thread.currentThread())) {
+                    accepted.run();
+                    return;
+                }
+
+                ctx.bindThread(Thread.currentThread());
             }
 
             Thread th = new Thread(() -> {
+                ctx.bindThread(Thread.currentThread());
                 try {
-                    ctx.bindThread(Thread.currentThread());
+                    if (await && joinedThread) {
+                        Core.instance.profile.joinedThreadStack.add(Thread.currentThread());
+                    }
                     accepted.run();
                 } catch (Throwable ex) {
                     if (!await) {
@@ -68,8 +76,10 @@ public class FWrapper extends PerExecLanguageLibrary<Globals> implements IFWrapp
                     }
                     error[0] = ex;
                 } finally {
-                    EventContainer<?> cc = ctx.getBoundEvents().get(Thread.currentThread());
-                    if (cc != null) cc.releaseLock();
+                    ctx.unbindThread(Thread.currentThread());
+                    Core.instance.profile.joinedThreadStack.remove(Thread.currentThread());
+
+                    ctx.releaseBoundEventIfPresent(Thread.currentThread());
 
                     lock.release();
                 }
@@ -79,10 +89,12 @@ public class FWrapper extends PerExecLanguageLibrary<Globals> implements IFWrapp
             if (await) {
                 try {
                     lock.acquire();
+                    if (error[0] != null) throw new RuntimeException(error[0]);
                 } catch (InterruptedException ex) {
                     throw new RuntimeException(ex);
+                } finally {
+                    ctx.unbindThread(Thread.currentThread());
                 }
-                if (error[0] != null) throw new RuntimeException(error[0]);
             }
         }
 

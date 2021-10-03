@@ -14,7 +14,6 @@ import xyz.wagyourtail.jsmacros.core.language.BaseScriptContext;
 import xyz.wagyourtail.jsmacros.core.language.BaseWrappedException;
 import xyz.wagyourtail.jsmacros.core.language.EventContainer;
 import xyz.wagyourtail.jsmacros.lua.config.LuaConfig;
-import xyz.wagyourtail.jsmacros.lua.luaj.ILuaError;
 
 import java.io.File;
 import java.util.Map;
@@ -77,9 +76,9 @@ public class LuaLanguageDefinition extends BaseLanguage<Globals> {
     @Override
     public BaseWrappedException<?> wrapException(Throwable ex) {
         if (ex instanceof LuaError) {
-            File file = ((ILuaError) ex).getFile();
-            int line = ((ILuaError) ex).getLine();
-            String error = ((ILuaError) ex).getErrorMessage();
+            File file = ((LuaError) ex).getFile();
+            int line = ((LuaError) ex).getLine();
+            String error = ((LuaError) ex).getErrorMessage();
             BaseWrappedException.SourceLocation loc = null;
             if (file != null) {
                 loc = new BaseWrappedException.GuestLocation(file, -1, -1, line, -1);
