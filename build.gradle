@@ -29,9 +29,8 @@ dependencies {
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-	modImplementation "com.github.wagyourtail.luaj:luaj-jse:combined-SNAPSHOT"
-	include "com.github.wagyourtail.luaj:luaj-jse:combined-SNAPSHOT"
-
+	modImplementation "com.github.wagyourtail.luaj:luaj-jse:a0981ca257"
+	include "com.github.wagyourtail.luaj:luaj-jse:a0981ca257"
 
 	//partial fabric api
 	modImplementation "net.fabricmc.fabric-api:fabric-api-base:${project.api_base_version}"
@@ -40,7 +39,7 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-resource-loader-v0:${project.resource_loader_version}"
 	modImplementation "net.fabricmc.fabric-api:fabric-command-api-v1:${project.command_api_version}"
 
-	modImplementation "com.github.wagyourtail:JsMacros:${project.jsmacros_version}"
+	modImplementation "com.github.wagyourtail:jsmacros:${project.jsmacros_version}"
 
 	implementation "org.graalvm.sdk:graal-sdk:${project.graal_version}"
 	implementation "org.graalvm.js:js:${project.graal_version}"
