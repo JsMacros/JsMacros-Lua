@@ -1,6 +1,7 @@
 package xyz.wagyourtail.jsmacros.lua.client;
 
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.api.ModInitializer;
 import org.luaj.vm2.Globals;
 import org.luaj.vm2.lib.jse.JsePlatform;
 import xyz.wagyourtail.jsmacros.client.JsMacros;
@@ -8,10 +9,10 @@ import xyz.wagyourtail.jsmacros.lua.config.LuaConfig;
 import xyz.wagyourtail.jsmacros.lua.language.impl.LuaLanguageDefinition;
 import xyz.wagyourtail.jsmacros.lua.library.impl.FWrapper;
 
-public class JsMacrosLua implements ClientModInitializer {
+public class JsMacrosLua implements ModInitializer {
     
     @Override
-    public void onInitializeClient() {
+    public void onInitialize() {
         
         JsMacros.core.addLanguage(new LuaLanguageDefinition(".lua", JsMacros.core));
         JsMacros.core.libraryRegistry.addLibrary(FWrapper.class);

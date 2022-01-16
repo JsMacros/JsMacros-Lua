@@ -29,8 +29,8 @@ dependencies {
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-	modImplementation "com.github.wagyourtail.luaj:luaj-jse:a0981ca257"
-	include "com.github.wagyourtail.luaj:luaj-jse:a0981ca257"
+	modImplementation "com.github.wagyourtail.luaj:luaj-jse:391b914ef1"
+	include "com.github.wagyourtail.luaj:luaj-jse:391b914ef1"
 
 	//partial fabric api
 	modImplementation "net.fabricmc.fabric-api:fabric-api-base:${project.api_base_version}"

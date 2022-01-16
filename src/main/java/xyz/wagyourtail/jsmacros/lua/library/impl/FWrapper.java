@@ -14,6 +14,7 @@ import xyz.wagyourtail.jsmacros.core.library.PerExecLanguageLibrary;
 import xyz.wagyourtail.jsmacros.lua.language.impl.LuaLanguageDefinition;
 
 import java.util.concurrent.Semaphore;
+import java.util.function.Supplier;
 
 @Library(value = "JavaWrapper", languages = LuaLanguageDefinition.class)
 public class FWrapper extends PerExecLanguageLibrary<Globals> implements IFWrapper<LuaClosure> {
@@ -49,52 +50,46 @@ public class FWrapper extends PerExecLanguageLibrary<Globals> implements IFWrapp
         }
 
         private void internal_accept(Runnable accepted, boolean await) {
-            Throwable[] error = {null};
-            Semaphore lock = new Semaphore(0);
-            boolean joinedThread = Core.instance.profile.checkJoinedThreadStack();
 
-            // if in the same lua context and not async...
             if (await) {
-                if (ctx.getBoundThreads().contains(Thread.currentThread())) {
+                internal_apply(() -> {
                     accepted.run();
-                    return;
-                }
-
-                ctx.bindThread(Thread.currentThread());
+                    return null;
+                });
+                return;
             }
 
             Thread th = new Thread(() -> {
                 ctx.bindThread(Thread.currentThread());
                 try {
-                    if (await && joinedThread) {
-                        Core.instance.profile.joinedThreadStack.add(Thread.currentThread());
-                    }
                     accepted.run();
                 } catch (Throwable ex) {
-                    if (!await) {
-                        Core.instance.profile.logError(ex);
-                    }
-                    error[0] = ex;
+                    Core.instance.profile.logError(ex);
                 } finally {
+                    ctx.releaseBoundEventIfPresent(Thread.currentThread());
                     ctx.unbindThread(Thread.currentThread());
                     Core.instance.profile.joinedThreadStack.remove(Thread.currentThread());
-
-                    ctx.releaseBoundEventIfPresent(Thread.currentThread());
-
-                    lock.release();
                 }
             });
             th.start();
+        }
 
-            if (await) {
-                try {
-                    lock.acquire();
-                    if (error[0] != null) throw new RuntimeException(error[0]);
-                } catch (InterruptedException ex) {
-                    throw new RuntimeException(ex);
-                } finally {
-                    ctx.unbindThread(Thread.currentThread());
+        private <A> A internal_apply(Supplier<A> supplier) {
+            if (ctx.getBoundThreads().contains(Thread.currentThread())) {
+                return supplier.get();
+            }
+            try {
+                ctx.bindThread(Thread.currentThread());
+                if (Core.instance.profile.checkJoinedThreadStack()) {
+                    Core.instance.profile.joinedThreadStack.add(Thread.currentThread());
                 }
+                return supplier.get();
+            } catch (Throwable ex) {
+                throw new RuntimeException(ex);
+            } finally {
+                ctx.releaseBoundEventIfPresent(Thread.currentThread());
+                ctx.unbindThread(Thread.currentThread());
+                Core.instance.profile.joinedThreadStack.remove(Thread.currentThread());
             }
         }
 
@@ -110,30 +105,22 @@ public class FWrapper extends PerExecLanguageLibrary<Globals> implements IFWrapp
 
         @Override
         public R apply(T t) {
-            Object[] retval = {null};
-            internal_accept(() -> retval[0] = CoerceLuaToJava.coerce(fn.call(CoerceJavaToLua.coerce(t)), Object.class), true);
-            return (R) retval[0];
+            return internal_apply(() -> (R) CoerceLuaToJava.coerce(fn.call(CoerceJavaToLua.coerce(t)), Object.class));
         }
 
         @Override
         public R apply(T t, U u) {
-            Object[] retval = {null};
-            internal_accept(() -> retval[0] = CoerceLuaToJava.coerce(fn.call(CoerceJavaToLua.coerce(t), CoerceJavaToLua.coerce(u)), Object.class), true);
-            return (R) retval[0];
+            return internal_apply(() -> (R) CoerceLuaToJava.coerce(fn.call(CoerceJavaToLua.coerce(t), CoerceJavaToLua.coerce(u)), Object.class));
         }
 
         @Override
         public boolean test(T t) {
-            boolean[] retval = {false};
-            internal_accept(() -> retval[0] = fn.call(CoerceJavaToLua.coerce(t)).toboolean(), true);
-            return retval[0];
+            return internal_apply(() -> fn.call(CoerceJavaToLua.coerce(t)).toboolean());
         }
 
         @Override
         public boolean test(T t, U u) {
-            boolean[] retval = {false};
-            internal_accept(() -> retval[0] = fn.call(CoerceJavaToLua.coerce(t), CoerceJavaToLua.coerce(u)).toboolean(), true);
-            return retval[0];
+            return internal_apply(() -> fn.call(CoerceJavaToLua.coerce(t), CoerceJavaToLua.coerce(u)).toboolean());
         }
 
         @Override
@@ -143,16 +130,12 @@ public class FWrapper extends PerExecLanguageLibrary<Globals> implements IFWrapp
 
         @Override
         public int compare(T o1, T o2) {
-            int[] retval = {0};
-            internal_accept(() -> retval[0] = fn.call(CoerceJavaToLua.coerce(o1), CoerceJavaToLua.coerce(o2)).toint(), true);
-            return retval[0];
+            return internal_apply(() -> fn.call(CoerceJavaToLua.coerce(o1), CoerceJavaToLua.coerce(o2)).toint());
         }
 
         @Override
         public R get() {
-            Object[] retval = {null};
-            internal_accept(() -> retval[0] = CoerceLuaToJava.coerce(fn.call(), Object.class), true);
-            return (R) retval[0];
+            return internal_apply(() -> (R) CoerceLuaToJava.coerce(fn.call(), Object.class));
         }
     }
 }

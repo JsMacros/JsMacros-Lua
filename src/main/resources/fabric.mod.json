@@ -14,7 +14,7 @@
   "icon": "assets/jsmacroslua/icon.png",
   "environment": "*",
   "entrypoints": {
-    "client": [
+    "main": [
       "xyz.wagyourtail.jsmacros.lua.client.JsMacrosLua"
     ]
   },
