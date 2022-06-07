@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '0.8-SNAPSHOT'
+	id 'fabric-loom' version '0.11-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -11,14 +11,12 @@ version = project.mod_version
 group = project.maven_group
 
 repositories {
-   flatDir {
-       dirs 'libs'
-   }
     maven {
         name "Modmuss50 Repository"
         url 'https://maven.fabricmc.net/'
     }
     mavenCentral()
+    maven { url 'https://maven.terraformersmc.com/releases/' }
     maven { url 'https://jitpack.io' }
     maven { url 'https://www.cursemaven.com' }
 }
@@ -32,33 +30,7 @@ dependencies {
 	modImplementation "com.github.wagyourtail.luaj:luaj-jse:391b914ef1"
 	include "com.github.wagyourtail.luaj:luaj-jse:391b914ef1"
 
-	//partial fabric api
-	modImplementation "net.fabricmc.fabric-api:fabric-api-base:${project.api_base_version}"
-	modImplementation "net.fabricmc.fabric-api:fabric-lifecycle-events-v1:${project.lifecycle_events_version}"
-	modImplementation "net.fabricmc.fabric-api:fabric-key-binding-api-v1:${project.key_bind_api_version}"
-	modImplementation "net.fabricmc.fabric-api:fabric-resource-loader-v0:${project.resource_loader_version}"
-	modImplementation "net.fabricmc.fabric-api:fabric-command-api-v1:${project.command_api_version}"
-
 	modImplementation "com.github.wagyourtail:jsmacros:${project.jsmacros_version}"
-
-	implementation "org.graalvm.sdk:graal-sdk:${project.graal_version}"
-	implementation "org.graalvm.js:js:${project.graal_version}"
-	implementation "org.graalvm.truffle:truffle-api:${project.graal_version}"
-//	if (targetCompatibility == JavaVersion.VERSION_16) {
-//		implementation "org.graalvm.compiler:compiler:${project.graal_version}"
-//		implementation "org.graalvm.compiler:compiler-management:${project.graal_version}"
-//	}
-	implementation "org.graalvm.regex:regex:${project.graal_version}"
-
-	implementation group: 'com.ibm.icu', name: 'icu4j', version: '67.1'
-
-	implementation "io.noties:prism4j:${project.prism_version}"
-
-	//nullable not defined so...
-	implementation 'com.google.code.findbugs:jsr305:3.0.2'
-
-	//for modmenu
-	modImplementation "net.fabricmc.fabric-api:fabric-screen-api-v1:1.0.4+155f865c13"
 }
 
 processResources {

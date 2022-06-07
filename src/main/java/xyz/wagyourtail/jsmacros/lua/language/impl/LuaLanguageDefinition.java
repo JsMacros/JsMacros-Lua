@@ -60,14 +60,14 @@ public class LuaLanguageDefinition extends BaseLanguage<Globals> {
             current.call();
         });
     }
-    
+
     @Override
-    protected void exec(EventContainer<Globals> ctx, String script, Map<String, Object> map) throws Exception {
+    protected void exec(EventContainer<Globals> ctx, String script, BaseEvent event) throws Exception {
         execContext(ctx, (globals) -> {
-        
-            map.forEach((name, lib) -> setPerExecVar(ctx.getCtx(), globals, name, CoerceJavaToLua.coerce(lib)));
+            setPerExecVar(ctx.getCtx(), globals, "event", CoerceJavaToLua.coerce(event));
+            setPerExecVar(ctx.getCtx(), globals, "file", CoerceJavaToLua.coerce(ctx.getCtx().getFile()));
             setPerExecVar(ctx.getCtx(), globals, "context", CoerceJavaToLua.coerce(ctx));
-    
+
             LuaValue current = globals.load(script);
             current.call();
         });
@@ -86,7 +86,7 @@ public class LuaLanguageDefinition extends BaseLanguage<Globals> {
             Throwable cause = ex.getCause();
             BaseWrappedException<?> causewrap = null;
             if (cause != null) {
-                causewrap = Core.instance.wrapException(cause);
+                causewrap = Core.getInstance().wrapException(cause);
             }
             return new BaseWrappedException<>(ex, error, loc, causewrap);
         }

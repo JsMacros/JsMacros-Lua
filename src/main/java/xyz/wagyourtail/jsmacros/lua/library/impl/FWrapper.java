@@ -64,11 +64,11 @@ public class FWrapper extends PerExecLanguageLibrary<Globals> implements IFWrapp
                 try {
                     accepted.run();
                 } catch (Throwable ex) {
-                    Core.instance.profile.logError(ex);
+                    Core.getInstance().profile.logError(ex);
                 } finally {
                     ctx.releaseBoundEventIfPresent(Thread.currentThread());
                     ctx.unbindThread(Thread.currentThread());
-                    Core.instance.profile.joinedThreadStack.remove(Thread.currentThread());
+                    Core.getInstance().profile.joinedThreadStack.remove(Thread.currentThread());
                 }
             });
             th.start();
@@ -80,8 +80,8 @@ public class FWrapper extends PerExecLanguageLibrary<Globals> implements IFWrapp
             }
             try {
                 ctx.bindThread(Thread.currentThread());
-                if (Core.instance.profile.checkJoinedThreadStack()) {
-                    Core.instance.profile.joinedThreadStack.add(Thread.currentThread());
+                if (Core.getInstance().profile.checkJoinedThreadStack()) {
+                    Core.getInstance().profile.joinedThreadStack.add(Thread.currentThread());
                 }
                 return supplier.get();
             } catch (Throwable ex) {
@@ -89,7 +89,7 @@ public class FWrapper extends PerExecLanguageLibrary<Globals> implements IFWrapp
             } finally {
                 ctx.releaseBoundEventIfPresent(Thread.currentThread());
                 ctx.unbindThread(Thread.currentThread());
-                Core.instance.profile.joinedThreadStack.remove(Thread.currentThread());
+                Core.getInstance().profile.joinedThreadStack.remove(Thread.currentThread());
             }
         }
 

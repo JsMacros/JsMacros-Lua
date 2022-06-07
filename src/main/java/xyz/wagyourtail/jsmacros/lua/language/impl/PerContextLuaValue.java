@@ -19,7 +19,7 @@ public class PerContextLuaValue extends LuaValue {
     }
 
     private BaseScriptContext<?> getCtx() {
-        return Core.instance.getContexts().stream().filter(e -> e.getBoundThreads().contains(Thread.currentThread())).findFirst().orElseThrow(RuntimeException::new);
+        return Core.getInstance().getContexts().stream().filter(e -> e.getBoundThreads().contains(Thread.currentThread())).findFirst().orElseThrow(RuntimeException::new);
     }
 
     @Override

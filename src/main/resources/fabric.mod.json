@@ -23,7 +23,7 @@
   "depends": {
     "fabricloader": ">=0.7.4",
     "minecraft": "*",
-    "jsmacros": "1.6.X"
+    "jsmacros": "1.7.X"
   },
   "custom": {
     "modmenu:parent": "jsmacros"
