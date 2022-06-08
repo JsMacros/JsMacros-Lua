@@ -7,13 +7,11 @@ import org.luaj.vm2.lib.jse.CoerceLuaToJava;
 import xyz.wagyourtail.jsmacros.core.Core;
 import xyz.wagyourtail.jsmacros.core.MethodWrapper;
 import xyz.wagyourtail.jsmacros.core.language.BaseScriptContext;
-import xyz.wagyourtail.jsmacros.core.language.EventContainer;
 import xyz.wagyourtail.jsmacros.core.library.IFWrapper;
 import xyz.wagyourtail.jsmacros.core.library.Library;
 import xyz.wagyourtail.jsmacros.core.library.PerExecLanguageLibrary;
 import xyz.wagyourtail.jsmacros.lua.language.impl.LuaLanguageDefinition;
 
-import java.util.concurrent.Semaphore;
 import java.util.function.Supplier;
 
 @Library(value = "JavaWrapper", languages = LuaLanguageDefinition.class)
