@@ -1,4 +1,4 @@
-package xyz.wagyourtail.jsmacros.lua.library.impl;
+package xyz.wagyourtail.jsmacros.luaj.library.impl;
 
 import org.luaj.vm2.Globals;
 import org.luaj.vm2.LuaClosure;
@@ -10,24 +10,25 @@ import xyz.wagyourtail.jsmacros.core.language.BaseScriptContext;
 import xyz.wagyourtail.jsmacros.core.library.IFWrapper;
 import xyz.wagyourtail.jsmacros.core.library.Library;
 import xyz.wagyourtail.jsmacros.core.library.PerExecLanguageLibrary;
-import xyz.wagyourtail.jsmacros.lua.language.impl.LuaLanguageDefinition;
+import xyz.wagyourtail.jsmacros.luaj.language.impl.LuajLanguageDefinition;
+import xyz.wagyourtail.jsmacros.luaj.language.impl.LuajScriptContext;
 
 import java.util.function.Supplier;
 
-@Library(value = "JavaWrapper", languages = LuaLanguageDefinition.class)
-public class FWrapper extends PerExecLanguageLibrary<Globals> implements IFWrapper<LuaClosure> {
+@Library(value = "JavaWrapper", languages = LuajLanguageDefinition.class)
+public class FWrapper extends PerExecLanguageLibrary<Globals, LuajScriptContext> implements IFWrapper<LuaClosure> {
 
-    public FWrapper(BaseScriptContext context, Class language) {
+    public FWrapper(LuajScriptContext context, Class language) {
         super(context, language);
     }
 
     @Override
-    public <A, B, R> MethodWrapper<A, B, R, BaseScriptContext<Globals>> methodToJava(LuaClosure luaClosure) {
+    public <A, B, R> MethodWrapper<A, B, R, LuajScriptContext> methodToJava(LuaClosure luaClosure) {
         return new LuaMethodWrapper<>(luaClosure, true, ctx);
     }
 
     @Override
-    public <A, B, R> MethodWrapper<A, B, R, BaseScriptContext<Globals>> methodToJavaAsync(LuaClosure luaClosure) {
+    public <A, B, R> MethodWrapper<A, B, R, LuajScriptContext> methodToJavaAsync(LuaClosure luaClosure) {
         return new LuaMethodWrapper<>(luaClosure, false, ctx);
     }
     
@@ -37,11 +38,11 @@ public class FWrapper extends PerExecLanguageLibrary<Globals> implements IFWrapp
     }
 
 
-    private static class LuaMethodWrapper<T, U, R> extends MethodWrapper<T, U, R, BaseScriptContext<Globals>> {
+    private static class LuaMethodWrapper<T, U, R> extends MethodWrapper<T, U, R, LuajScriptContext> {
         private final LuaClosure fn;
         private final boolean await;
 
-        LuaMethodWrapper(LuaClosure fn, boolean await, BaseScriptContext<Globals> ctx) {
+        LuaMethodWrapper(LuaClosure fn, boolean await, LuajScriptContext ctx) {
             super(ctx);
             this.fn = fn;
             this.await = await;

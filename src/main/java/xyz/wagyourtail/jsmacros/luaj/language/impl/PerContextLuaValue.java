@@ -1,4 +1,4 @@
-package xyz.wagyourtail.jsmacros.lua.language.impl;
+package xyz.wagyourtail.jsmacros.luaj.language.impl;
 
 import org.luaj.vm2.*;
 import xyz.wagyourtail.jsmacros.core.Core;

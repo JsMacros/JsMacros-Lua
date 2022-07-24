@@ -1,8 +1,8 @@
-package xyz.wagyourtail.jsmacros.lua.config;
+package xyz.wagyourtail.jsmacros.luaj.config;
 
 import xyz.wagyourtail.jsmacros.core.config.Option;
 
-public class LuaConfig {
+public class LuajConfig {
     @Option(translationKey = "jsmacroslua.globalcontext", group = {"jsmacros.settings.languages", "jsmacroslua.settings.languages.lua"})
     public boolean useGlobalContext = false;
 }

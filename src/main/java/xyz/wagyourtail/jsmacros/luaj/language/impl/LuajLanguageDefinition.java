@@ -1,4 +1,4 @@
-package xyz.wagyourtail.jsmacros.lua.language.impl;
+package xyz.wagyourtail.jsmacros.luaj.language.impl;
 
 import org.luaj.vm2.Globals;
 import org.luaj.vm2.LuaClosure;
@@ -13,23 +13,23 @@ import xyz.wagyourtail.jsmacros.core.language.BaseLanguage;
 import xyz.wagyourtail.jsmacros.core.language.BaseScriptContext;
 import xyz.wagyourtail.jsmacros.core.language.BaseWrappedException;
 import xyz.wagyourtail.jsmacros.core.language.EventContainer;
-import xyz.wagyourtail.jsmacros.lua.config.LuaConfig;
+import xyz.wagyourtail.jsmacros.luaj.LuajExtension;
+import xyz.wagyourtail.jsmacros.luaj.config.LuajConfig;
 
 import java.io.File;
-import java.util.Map;
 
-public class LuaLanguageDefinition extends BaseLanguage<Globals> {
+public class LuajLanguageDefinition extends BaseLanguage<Globals, LuajScriptContext> {
 
     public final Globals globalGlobals = JsePlatform.debugGlobals();
 
-    public LuaLanguageDefinition(String extension, Core runner) {
+    public LuajLanguageDefinition(LuajExtension extension, Core runner) {
         super(extension, runner);
     }
     
-    protected void execContext(EventContainer<Globals> ctx, Executor e) throws Exception {
+    protected void execContext(EventContainer<LuajScriptContext> ctx, Executor e) throws Exception {
         Globals globals;
         
-        if (runner.config.getOptions(LuaConfig.class).useGlobalContext) globals = globalGlobals;
+        if (runner.config.getOptions(LuajConfig.class).useGlobalContext) globals = globalGlobals;
         else globals = JsePlatform.debugGlobals();
         ctx.getCtx().setContext(globals);
     
@@ -46,7 +46,7 @@ public class LuaLanguageDefinition extends BaseLanguage<Globals> {
     }
     
     @Override
-    protected void exec(EventContainer<Globals> ctx, ScriptTrigger macro, BaseEvent event) throws Exception {
+    protected void exec(EventContainer<LuajScriptContext> ctx, ScriptTrigger macro, BaseEvent event) throws Exception {
         execContext(ctx, (globals) -> {
             setPerExecVar(ctx.getCtx(), globals, "event", CoerceJavaToLua.coerce(event));
             setPerExecVar(ctx.getCtx(), globals, "file", CoerceJavaToLua.coerce(ctx.getCtx().getFile()));
@@ -62,7 +62,7 @@ public class LuaLanguageDefinition extends BaseLanguage<Globals> {
     }
 
     @Override
-    protected void exec(EventContainer<Globals> ctx, String script, BaseEvent event) throws Exception {
+    protected void exec(EventContainer<LuajScriptContext> ctx, String lang, String script, BaseEvent event) throws Exception {
         execContext(ctx, (globals) -> {
             setPerExecVar(ctx.getCtx(), globals, "event", CoerceJavaToLua.coerce(event));
             setPerExecVar(ctx.getCtx(), globals, "file", CoerceJavaToLua.coerce(ctx.getCtx().getFile()));
@@ -74,28 +74,8 @@ public class LuaLanguageDefinition extends BaseLanguage<Globals> {
     }
     
     @Override
-    public BaseWrappedException<?> wrapException(Throwable ex) {
-        if (ex instanceof LuaError) {
-            File file = ((LuaError) ex).getFile();
-            int line = ((LuaError) ex).getLine();
-            String error = ((LuaError) ex).getErrorMessage();
-            BaseWrappedException.SourceLocation loc = null;
-            if (file != null) {
-                loc = new BaseWrappedException.GuestLocation(file, -1, -1, line, -1);
-            }
-            Throwable cause = ex.getCause();
-            BaseWrappedException<?> causewrap = null;
-            if (cause != null) {
-                causewrap = Core.getInstance().wrapException(cause);
-            }
-            return new BaseWrappedException<>(ex, error, loc, causewrap);
-        }
-        return null;
-    }
-    
-    @Override
-    public BaseScriptContext<Globals> createContext(BaseEvent event, File file) {
-        return new LuaScriptContext(event, file);
+    public LuajScriptContext createContext(BaseEvent event, File file) {
+        return new LuajScriptContext(event, file);
     }
     
     private interface Executor {
